@@ -32,25 +32,26 @@ class ChatView : Application() {
         primaryStage.title = "Проточат"
         primaryStage.isResizable = false
         val pane = GridPane()
-        pane.hgap = 4.0
-        pane.vgap = 4.0
         val messageField = TextArea()
         messageField.promptText = "Bведите сообщение"
-        messageField.minHeight = COMPOSE_HEIGHT
-        messageField.maxHeight = COMPOSE_HEIGHT
+        messageField.prefHeight = COMPOSE_HEIGHT
+        messageField.prefWidth = WINDOW_WIDTH - SEND_WIDTH
         val sendButton = Button("Oтправить")
-        sendButton.minHeight = COMPOSE_HEIGHT
-        sendButton.maxHeight = COMPOSE_HEIGHT
-        sendButton.minWidth = SEND_WIDTH
+        sendButton.prefHeight = COMPOSE_HEIGHT
+        sendButton.prefWidth = SEND_WIDTH
         val messageList = FXCollections.observableArrayList(Message("Петя", LocalDateTime.now(), "Привет"))
         val messageListView = ListView(messageList)
+        messageListView.prefHeight = WINDOW_HEIGHT - COMPOSE_HEIGHT
         sendButton.onMouseClicked = EventHandler {
+            if (messageField.text.isNotEmpty()) {
                 messageList.add(Message(name, LocalDateTime.now(), messageField.text))
+                messageField.text = ""
+            }
         }
         pane.add(messageField, 0, 0)
         pane.add(sendButton, 1, 0)
         pane.add(messageListView, 0, 1, 2, 1)
-        val scene = Scene(pane, 600.0, 600.0)
+        val scene = Scene(pane, WINDOW_WIDTH, WINDOW_HEIGHT)
         primaryStage.scene = scene
         primaryStage.show()
     }
@@ -58,5 +59,7 @@ class ChatView : Application() {
     companion object {
         const val COMPOSE_HEIGHT = 60.0
         const val SEND_WIDTH = 100.0
+        const val WINDOW_HEIGHT = 700.0
+        const val WINDOW_WIDTH = 800.0
     }
 }
