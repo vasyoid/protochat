@@ -1,0 +1,11 @@
+option java_package = "proto";
+
+message Empty {}
+message Message {
+    required string author = 1;
+    required string content = 2;
+}
+
+service ChatService {
+    rpc AddNewMessage(Message) returns (Empty) {}
+}

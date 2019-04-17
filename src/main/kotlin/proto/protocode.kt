@@ -1,0 +1,4 @@
+package proto
+
+fun aba() {
+}
