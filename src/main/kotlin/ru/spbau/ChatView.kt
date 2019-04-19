@@ -13,21 +13,14 @@ import java.time.LocalDateTime
 
 class ChatView : Application() {
 
-    private var isServer = true
-    private var address: String = ""
-    private var port = 0
-    private var name = ""
+    private lateinit var backend: ChatBackend
 
     override fun start(primaryStage: Stage) {
         val args = parameters.unnamed
-        if (args.size == 2) {
-            isServer = false
-            port = args[0].toInt()
-            name = args[1]
+        backend = if (args.size == 2) {
+            ChatBackend(args[0].toInt(), args[1])
         } else {
-            address = args[0]
-            port = args[1].toInt()
-            name = args[2]
+            ChatBackend(args[1].toInt(), args[2], args[0])
         }
         primaryStage.title = "Проточат"
         primaryStage.isResizable = false
@@ -44,7 +37,8 @@ class ChatView : Application() {
         messageListView.prefHeight = WINDOW_HEIGHT - COMPOSE_HEIGHT
         sendButton.onMouseClicked = EventHandler {
             if (messageField.text.isNotEmpty()) {
-                messageList.add(Message(name, LocalDateTime.now(), messageField.text))
+                val newMessage = Message("Вы", LocalDateTime.now(), messageField.text)
+                messageList.add(newMessage)
                 messageField.text = ""
             }
         }
