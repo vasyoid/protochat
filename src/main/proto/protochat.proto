@@ -1,19 +1,11 @@
-syntax = "proto3";
+option java_package = "proto";
 
-package ru.spbau;
-
-message Connect {
-    string name = 1;
-}
-
+message Empty {}
 message Message {
-    string name = 1;
-    string message = 2;
+    required string author = 1;
+    required string content = 2;
 }
 
-message Empty { }
-
-service ProtoChat {
-    rpc SendMessage(Message) returns (Empty) { }
-    rpc ReceiveMessage(Empty) returns (Message) { }
+service ChatService {
+    rpc AddNewMessage(Message) returns (Empty) {}
 }

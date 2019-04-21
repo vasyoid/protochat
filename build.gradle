@@ -12,6 +12,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'org.openjfx.javafxplugin' version '0.0.7'
+}
+
 apply plugin: 'kotlin'
 apply plugin: 'com.google.protobuf'
 apply plugin: 'idea'
@@ -21,9 +25,16 @@ version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
+mainClassName='ru.spbau.MainKT'
+
 repositories {
     mavenCentral()
     jcenter()
+}
+
+javafx {
+    version = "11.0.2"
+    modules = [ 'javafx.controls' ]
 }
 
 dependencies {
@@ -36,13 +47,13 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
+
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
-
 
 protobuf {
     protoc {
@@ -58,4 +69,5 @@ protobuf {
             grpc {}
         }
     }
+    generatedFilesBaseDir = "$projectDir/src"
 }

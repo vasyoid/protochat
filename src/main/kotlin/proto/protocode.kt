@@ -1,4 +1,0 @@
-package proto
-
-fun aba() {
-}
