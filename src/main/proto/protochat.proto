@@ -15,5 +15,5 @@ message Empty { }
 
 service ProtoChat {
     rpc SendMessage(Message) returns (Empty) { }
-    rpc ReceiveMessage(Empty) returns (Message) { }
+    rpc ReceiveMessage(Empty) returns (stream Message) { }
 }
