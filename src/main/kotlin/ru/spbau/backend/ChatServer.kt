@@ -11,33 +11,39 @@ class ChatServer(
 
     private val chatService: ChatService = ChatService(this)
 
-    private var incoming = mutableListOf<Message>()
-    private var outgoing = mutableListOf<Message>()
+    private val incoming = mutableListOf<Message>()
+    private val outgoing = mutableListOf<Message>()
 
     init {
         ServerBuilder.forPort(port).addService(chatService).build().start()
     }
 
     fun getOutgoing(): List<Message> {
-        val old = mutableListOf<Message>()
-        old.addAll(outgoing)
-        outgoing = mutableListOf()
-        return old
+        synchronized(outgoing) {
+            return outgoing.toList().also {
+                outgoing.clear()
+            }
+        }
     }
 
     override fun sendMessage(message: Message): Message {
-        outgoing.add(message)
-        return message
+        synchronized(outgoing) {
+            outgoing.add(message)
+            return message
+        }
     }
 
     override fun receive(): List<Message> {
-        val old = mutableListOf<Message>()
-        old.addAll(incoming)
-        incoming = mutableListOf()
-        return old
+        synchronized(incoming) {
+            return incoming.toList().also {
+                incoming.clear()
+            }
+        }
     }
 
     fun receiveMessage(message: Message) {
-        incoming.add(message)
+        synchronized(incoming) {
+            incoming.add(message)
+        }
     }
 }
