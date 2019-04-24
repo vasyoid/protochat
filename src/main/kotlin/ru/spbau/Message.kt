@@ -10,17 +10,18 @@ data class Message(
     val message: String
 ) {
 
-    fun serialize(): Protochat.Message = Protochat.Message.newBuilder()
-        .setName(author)
-        .setMessage(message)
-        .build()
-
-    override fun toString() = author + ", " + date.format(FMT) + ":\n" + message
+    override fun toString() = author + "\n" + date.format(FMT) + "\n" + message
 
     companion object {
 
         private val FMT = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM)
 
-        fun deserialize(message: Protochat.Message) = Message(message.name, LocalDateTime.now(), message.message)
+        fun deserialize(text: String): Message {
+            val tokens = text.split("\n")
+            val author = tokens[0]
+            val date = LocalDateTime.parse(tokens[1], FMT)
+            val message = tokens[2]
+            return Message(author, date, message)
+        }
     }
 }

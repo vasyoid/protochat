@@ -1,18 +1,53 @@
 package ru.spbau.backend
 
+import com.rabbitmq.client.*
+import javafx.collections.ObservableList
 import ru.spbau.Message
 import java.time.LocalDateTime
+import java.nio.charset.Charset
 
-abstract class ChatBackend(
-    private val userName: String
+
+class ChatBackend(
+    private val userName: String,
+    private val messageList: ObservableList<Message>,
+    host: String,
+    port: Int
 ) {
-    fun send(text: String): Message {
-        val message = Message(userName, LocalDateTime.now(), text)
-        return sendMessage(message)
+    private val channel: Channel
+    private val connection: Connection
+
+
+    init {
+        val factory = ConnectionFactory()
+        factory.host = host
+        factory.port = port
+        connection = factory.newConnection()
+        channel = connection.createChannel()
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null)
+
+        val consumer: Consumer = object : DefaultConsumer(channel) {
+            override fun handleDelivery(
+                consumerTag: String, envelope: Envelope,
+                properties: AMQP.BasicProperties, body: ByteArray
+            ) {
+                val message = String(body, Charset.defaultCharset())
+                println(message)
+                messageList.add(Message.deserialize(message))
+            }
+        }
+
+        channel.basicConsume(QUEUE_NAME, true, consumer)
     }
 
-    abstract fun sendMessage(message: Message): Message
+    fun send(text: String) {
+        val message = Message(userName, LocalDateTime.now(), text)
+        val cnt = channel.consumerCount(QUEUE_NAME)
+        for (i in 0 until cnt) {
+            channel.basicPublish("", QUEUE_NAME, null, message.toString().toByteArray())
+        }
+    }
 
-    abstract fun receive(): List<Message>
-
+    companion object {
+        private const val QUEUE_NAME = "queue_chat"
+    }
 }
